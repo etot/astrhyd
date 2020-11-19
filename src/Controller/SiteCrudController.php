@@ -40,22 +40,6 @@ class SiteCrudController extends AbstractCrudController
             ->addJsFile('js/siteform.js');
     }
 
-    /*
-    public function configureActions(Actions $actions): Actions
-    {
-        $send_acknowledgement_email = Action::new('getCurrentSite', 'get current site', 'fa fa-send')
-        ->linkToCrudAction('getCurrentSite');
-
-        return $actions->add(Crud::PAGE_EDIT, $send_acknowledgement_email);
-    }
-
-    public function getCurrentSite(AdminContext $context)
-    {
-        $oSite = $context->getEntity()->getInstance();
-        dump($oSite); die();
-    }
-    */
-
     // permet de récupérer les valeurs d'un site édité dans le formulaire d'édit
     // afin de pré-remplir le champ "communes" à partir de la valeur de "département"
     public function edit(AdminContext $context)
@@ -84,20 +68,32 @@ class SiteCrudController extends AbstractCrudController
 
         $client = HttpClient::create();
 
-        // codes réseaux
-        $oCRresponse = $client->request('GET', 'https://api.sandre.eaufrance.fr/referentiels/v1/dc.json?outputSchema=SANDREv4');
-        $aContent = $oCRresponse->toArray();
         $aDCCodes = array();
 
-        if(is_object($this->oCurrentSite) && !is_null($this->oCurrentSite->getCodeReseau()))
+        // codes réseaux
+        if($pageName != Crud::PAGE_INDEX) // pour ne pas faire un appel inutile à l'API sur index
         {
-            $aDCCodes[$this->oCurrentSite->getCodeReseau()] = $this->oCurrentSite->getCodeReseau();
-        }
+            $oCRresponse = $client->request('GET', 'https://api.sandre.eaufrance.fr/referentiels/v1/dc.json?outputSchema=SANDREv4');
+            $aContent = $oCRresponse->toArray();
 
-        $aDispositifsCollecte = $aContent['REFERENTIELS']['Referentiel']['DispositifCollecte'];
-        foreach($aDispositifsCollecte as $aDispositifCollecte)
+            if(is_object($this->oCurrentSite) && !is_null($this->oCurrentSite->getCodeReseau()))
+            {
+                $aDCCodes[$this->oCurrentSite->getCodeReseau()] = $this->oCurrentSite->getCodeReseau();
+            }
+
+            $aDispositifsCollecte = $aContent['REFERENTIELS']['Referentiel']['DispositifCollecte'];
+            foreach($aDispositifsCollecte as $aDispositifCollecte)
+            {
+                $aDCCodes[$aDispositifCollecte['CodeSandreRdd'] . ' ' . $aDispositifCollecte['NomRdd']] = $aDispositifCollecte['CodeSandreRdd'];
+            }
+        }
+        elseif(is_object($this->oCurrentSite))
         {
-            $aDCCodes[$aDispositifCollecte['CodeSandreRdd'] . ' ' . $aDispositifCollecte['NomRdd']] = $aDispositifCollecte['CodeSandreRdd'];
+            $sCurrentCodeReseau = $this->oCurrentSite->getCodeReseau();
+            if($sCurrentCodeReseau)
+            {
+                $aDCCodes[$sCurrentCodeReseau] = $sCurrentCodeReseau;
+            }
         }
 
         // départements
@@ -116,7 +112,6 @@ class SiteCrudController extends AbstractCrudController
         {
             $sCurrentDept = $this->oCurrentSite->getDepartement();
         }
-
         $oCitiesresponse = $client->request('GET', 'https://geo.api.gouv.fr/departements/' . $sCurrentDept . '/communes');
         $aCitiesArray = $oCitiesresponse->toArray();
         foreach($aCitiesArray as $aCity)

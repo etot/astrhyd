@@ -24,9 +24,9 @@ class PointPrelevementCrudController extends AbstractCrudController
             TextField::new('support'), 
             NumberField::new('coord_x_l93'),
             NumberField::new('coord_y_l93'),
-            TextField::new('station_point'), 
-            TextField::new('reseau_station_point'), 
-            TextField::new('reseau_station'),    
+            TextField::new('station_point')->hideOnIndex(), 
+            TextField::new('reseau_station_point')->hideOnIndex(), 
+            TextField::new('reseau_station')->hideOnIndex(),    
             AssociationField::new('site'),
             AssociationField::new('station'),
             

@@ -216,4 +216,9 @@ class PointPrelevement
 
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->num_base;
+    }
 }
