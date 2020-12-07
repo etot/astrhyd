@@ -18,8 +18,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 
 /**
@@ -76,23 +74,10 @@ class SiteCrudController extends AbstractCrudController
             $oCRresponse = $client->request('GET', 'https://api.sandre.eaufrance.fr/referentiels/v1/dc.json?outputSchema=SANDREv4');
             $aContent = $oCRresponse->toArray();
 
-            if(is_object($this->oCurrentSite) && !is_null($this->oCurrentSite->getCodeReseau()))
-            {
-                $aDCCodes[$this->oCurrentSite->getCodeReseau()] = $this->oCurrentSite->getCodeReseau();
-            }
-
             $aDispositifsCollecte = $aContent['REFERENTIELS']['Referentiel']['DispositifCollecte'];
             foreach($aDispositifsCollecte as $aDispositifCollecte)
             {
                 $aDCCodes[$aDispositifCollecte['CodeSandreRdd'] . ' ' . $aDispositifCollecte['NomRdd']] = $aDispositifCollecte['CodeSandreRdd'];
-            }
-        }
-        elseif(is_object($this->oCurrentSite))
-        {
-            $sCurrentCodeReseau = $this->oCurrentSite->getCodeReseau();
-            if($sCurrentCodeReseau)
-            {
-                $aDCCodes[$sCurrentCodeReseau] = $sCurrentCodeReseau;
             }
         }
 
@@ -112,6 +97,7 @@ class SiteCrudController extends AbstractCrudController
         {
             $sCurrentDept = $this->oCurrentSite->getDepartement();
         }
+
         $oCitiesresponse = $client->request('GET', 'https://geo.api.gouv.fr/departements/' . $sCurrentDept . '/communes');
         $aCitiesArray = $oCitiesresponse->toArray();
         foreach($aCitiesArray as $aCity)
@@ -186,7 +172,11 @@ class SiteCrudController extends AbstractCrudController
                 ->renderCollapsed(true),
             TextEditorField::new('descriptif_travaux')->hideOnIndex(),
             TextEditorField::new('elements_contexte')->hideOnIndex(),      
-           
+    
+            FormField::addPanel('Stations')
+            ->setIcon('fa fa-cogs')
+            ->collapsible(true)
+            ->renderCollapsed(true),
             AssociationField::new('stations'),
         ];
     }

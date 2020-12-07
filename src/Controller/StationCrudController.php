@@ -6,6 +6,7 @@ use App\Entity\PointPrelevement;
 use App\Entity\Station;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -14,6 +15,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpClient\HttpClient;
+use EasyCorp\Bundle\EasyAdminBundle\Router\CrudUrlGenerator;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 
 class StationCrudController extends AbstractCrudController
 {
@@ -31,67 +34,86 @@ class StationCrudController extends AbstractCrudController
         return $actions->add(Crud::PAGE_EDIT, $getpointsprelev);
     }
 
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets
+            //->addJsFile('https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js')
+            ->addCssFile('https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css')
+            //->addJsFile('https://code.jquery.com/jquery-1.12.4.js')
+            ->addJsFile('https://code.jquery.com/ui/1.12.1/jquery-ui.js')
+            ->addJsFile('js/stationform.js');
+    }
+
     public function setPointsPrelevements(AdminContext $context)
     {
         $oCurrentStation = $context->getEntity()->getInstance(); 
 
+        $crudUrlGenerator = $this->get(CrudUrlGenerator::class);
+        $redirectUrl = $crudUrlGenerator->build()
+            ->setController(StationCrudController::class)
+            ->setAction('edit')
+            ->generateUrl();
+            
+        $aCurrentPtsPrelevements = $oCurrentStation->getPointPrelevements();
+
+        // si la station est déjà associée à des points de prélèvements 
+        // alors on ne fait rien
+        if(!$aCurrentPtsPrelevements->isEmpty())
+        {
+            $this->addFlash('warning', 'Vous ne pouvez pas associer automatiquement des points de prélèvements à cette station car des points de prélèvements y sont déjà associés.');
+            return $this->redirect($redirectUrl);
+        }
+
         $code = $oCurrentStation->getCode();
-        $url = 'https://api.sandre.eaufrance.fr/referentiels/v1/stq.json?outputSchema=SANDREv4&filter=%3CFilter%3E%3CIS%3E%3CField%3ECdStationMesureEauxSurface%3C%2FField%3E%3CValue%3E' . $code . '%3C%2FValue%3E%3C%2FIS%3E%3C%2FFilter%3E&limit=100';
         
+        // TODO utiliser cette URL plus simple
+        // $sandreApiUrl =  'https://api.sandre.eaufrance.fr/referentiels/v1/stq/';  
+        // $sandreApiUrl .= $code . '.json';
+        
+        $sandreApiUrl = 'https://api.sandre.eaufrance.fr/referentiels/v1/stq.json?outputSchema=SANDREv4&filter=%3CFilter%3E%3CIS%3E%3CField%3ECdStationMesureEauxSurface%3C%2FField%3E%3CValue%3E';
+        $sandreApiUrl .= $code . '%3C%2FValue%3E%3C%2FIS%3E%3C%2FFilter%3E&limit=100';
+        $sandreApiUrl .= '&compress=true';
+
         $client = HttpClient::create();
-        $oPPresponse = $client->request('GET', $url);
-        $aContent = $oPPresponse->toArray();
+        $oGzPPresponse = $client->request('GET', $sandreApiUrl);
+        $aContent = json_decode(gzdecode($oGzPPresponse->getContent()), true); 
 
         $entityManager = $this->getDoctrine()->getManager();
-            
-        // suppression des points actuellement associés à la station
-        // cette opération est faite après l'appel à l'API Sandre, afin de ne pas les supprimer si la requête n'aboutit pas
-        $aCurrentPtsPrelevements = $oCurrentStation->getOperationPrelevements();
-        foreach($aCurrentPtsPrelevements as $oCurrentPtPrelevement)
-        {
-            $oCurrentStation->removeOperationPrelevement($oCurrentPtPrelevement);
-        }
         
         $aPointPrelEauxSurf = $aContent['REFERENTIELS']['Referentiel']['StationMesureEauxSurface'][0]['PointPrelEauxSurf'];
-        foreach($aPointPrelEauxSurf as $oPointPrelEauxSurf)
+        
+        if(isset($aPointPrelEauxSurf[0])) // cas où c'est un tableau de points de preleb
+        {
+            foreach($aPointPrelEauxSurf as $oPointPrelEauxSurf)
+            {
+                $oNewPtPrelev = new PointPrelevement();
+                $oNewPtPrelev->setStation($oCurrentStation);
+                $oNewPtPrelev->setSite($oCurrentStation->getSites()[0]); // TODO QUID si plusieurs sites ?
+                $oNewPtPrelev->setSupport($oPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
+                $oNewPtPrelev->setCoordXL93($oPointPrelEauxSurf['CoordXPointEauxSurf']);
+                $oNewPtPrelev->setCoordYL93($oPointPrelEauxSurf['CoordYPointEauxSurf']);
+                $oNewPtPrelev->setNumBase($oPointPrelEauxSurf['CdPointEauxSurf']); 
+                $entityManager->persist($oNewPtPrelev);            
+                $oCurrentStation->addPointPrelevement($oNewPtPrelev); 
+            }
+        }
+        elseif(isset($aPointPrelEauxSurf['CdPointEauxSurf'])) // cas où un seul point de prelev
         {
             $oNewPtPrelev = new PointPrelevement();
             $oNewPtPrelev->setStation($oCurrentStation);
             $oNewPtPrelev->setSite($oCurrentStation->getSites()[0]); // TODO QUID si plusieurs sites ?
-            $oNewPtPrelev->setSupport($oPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
-            $oNewPtPrelev->setCoordXL93($oPointPrelEauxSurf['CoordXPointEauxSurf']);
-            $oNewPtPrelev->setCoordYL93($oPointPrelEauxSurf['CoordYPointEauxSurf']);
-            $oNewPtPrelev->setNumBase($oPointPrelEauxSurf['CdPointEauxSurf']); 
-/*
-TODO vérifier si d'autres champs sont nécessaires
-
-attendus (cf specs)
-    Point  Prélèvement  
-    station_point
-    reseau_station_point
-    reseau_station
-
-reçus (schéma Sandre)
-    CdPointEauxSurf
-    TypPointEauxSurf
-    LbPointEauxSurf       
-    ProjPointEauxSurf
-    ModeObtentionPointEauxSurf
-    NaturePointEauxSurf
-    DateMiseServicePointEauxSurf
-    DateMajPointEauxSurf
-    RsxStationPeriod[] 
-        DateDebutAppartReseauMesure 
-        DispositifCollecte
-            CodeSandreRdd
-*/
+            $oNewPtPrelev->setSupport($aPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
+            $oNewPtPrelev->setCoordXL93($aPointPrelEauxSurf['CoordXPointEauxSurf']);
+            $oNewPtPrelev->setCoordYL93($aPointPrelEauxSurf['CoordYPointEauxSurf']);
+            $oNewPtPrelev->setNumBase($aPointPrelEauxSurf['CdPointEauxSurf']); 
             $entityManager->persist($oNewPtPrelev);            
             $oCurrentStation->addPointPrelevement($oNewPtPrelev); 
-            // $entityManager->flush();
         }
         $entityManager->flush();
-        // TODO renvoie vers la page d'édition
-        return parent::edit($context);
+
+        $this->addFlash('success', 'Les points de prélèvements déclarés dans le Sandre ont bien été associés à cette station.');
+            
+        return $this->redirect($redirectUrl);
     }
 
     public function configureFields(string $pageName): iterable
@@ -105,7 +127,7 @@ reçus (schéma Sandre)
             TextEditorField::new('precision_positionnement')->hideOnIndex(),
             BooleanField::new('suivi_indicateurs_fonctionnels')->hideOnIndex(),
             AssociationField::new('finalite')->setRequired(true)->hideOnIndex(),
-            AssociationField::new('pointPrelevements')->hideOnIndex(),
+            AssociationField::new('pointPrelevements'),
         ];
     }
 }
