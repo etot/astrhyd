@@ -50,7 +50,15 @@ class SiteCrudController extends AbstractCrudController
     public function createEditFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
     {
         $formBuilder = parent::createEditFormBuilder($entityDto, $formOptions, $context);
+        $formBuilder->get('commune')->resetViewTransformers();
+        $formBuilder->get('code_reseau')->resetViewTransformers();
+        return $formBuilder;
+    }
 
+    // permet d'éviter le problème lié à l'ajout de communes en ajax (this value is not valid)
+    public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
+    {
+        $formBuilder = parent::createNewFormBuilder($entityDto, $formOptions, $context);
         $formBuilder->get('commune')->resetViewTransformers();
         $formBuilder->get('code_reseau')->resetViewTransformers();
         return $formBuilder;
