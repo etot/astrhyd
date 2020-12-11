@@ -18,16 +18,6 @@ class OperationPrelevement
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Site::class, inversedBy="operationPrelevements")
-     */
-    private $site;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Station::class, inversedBy="operationPrelevements")
-     */
-    private $station;
-
-    /**
      * @ORM\ManyToOne(targetEntity=PointPrelevement::class, inversedBy="operationPrelevements")
      */
     private $pointPrelevement;
@@ -80,30 +70,6 @@ class OperationPrelevement
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getSite(): ?Site
-    {
-        return $this->site;
-    }
-
-    public function setSite(?Site $site): self
-    {
-        $this->site = $site;
-
-        return $this;
-    }
-
-    public function getStation(): ?Station
-    {
-        return $this->station;
-    }
-
-    public function setStation(?Station $station): self
-    {
-        $this->station = $station;
-
-        return $this;
     }
 
     public function getPointPrelevement(): ?PointPrelevement

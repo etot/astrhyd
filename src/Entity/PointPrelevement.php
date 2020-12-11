@@ -55,17 +55,12 @@ class PointPrelevement
     private $reseau_station;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Site::class, inversedBy="pointPrelevements")
-     */
-    private $site;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Station::class, inversedBy="pointPrelevements")
      */
     private $station;
 
     /**
-     * @ORM\OneToMany(targetEntity=OperationPrelevement::class, mappedBy="pointPrelevement")
+     * @ORM\OneToMany(targetEntity=OperationPrelevement::class, mappedBy="pointPrelevement", cascade={"persist"})
      */
     private $operationPrelevements;
 
@@ -163,18 +158,6 @@ class PointPrelevement
         return $this;
     }
 
-    public function getSite(): ?Site
-    {
-        return $this->site;
-    }
-
-    public function setSite(?Site $site): self
-    {
-        $this->site = $site;
-
-        return $this;
-    }
-
     public function getStation(): ?Station
     {
         return $this->station;
@@ -219,6 +202,6 @@ class PointPrelevement
 
     public function __toString()
     {
-        return $this->num_base;
+        return $this->station->getCode() . '-' . $this->num_base;
     }
 }

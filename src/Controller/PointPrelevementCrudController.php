@@ -27,17 +27,14 @@ class PointPrelevementCrudController extends AbstractCrudController
             TextField::new('station_point')->hideOnIndex(), 
             TextField::new('reseau_station_point')->hideOnIndex(), 
             TextField::new('reseau_station')->hideOnIndex(),    
-            AssociationField::new('site'),
             AssociationField::new('station'),
             
             CollectionField::new('operationPrelevements', 'OperationPrelevement')
                 ->allowAdd() 
                 ->allowDelete()
-                ->setEntryIsComplex(true)
-                ->setEntryType(OperationPrelevementType::class)
-                ->setFormTypeOptions([
-                    'by_reference' => 'false' 
-                ]),
+                // ->setEntryIsComplex(true)
+                ->setEntryType(OperationPrelevementType::class),
+                // ->setFormTypeOptions(['by_reference' => 'false']),
             
         ];
     }

@@ -88,7 +88,6 @@ class StationCrudController extends AbstractCrudController
             {
                 $oNewPtPrelev = new PointPrelevement();
                 $oNewPtPrelev->setStation($oCurrentStation);
-                $oNewPtPrelev->setSite($oCurrentStation->getSites()[0]); // TODO QUID si plusieurs sites ?
                 $oNewPtPrelev->setSupport($oPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
                 $oNewPtPrelev->setCoordXL93($oPointPrelEauxSurf['CoordXPointEauxSurf']);
                 $oNewPtPrelev->setCoordYL93($oPointPrelEauxSurf['CoordYPointEauxSurf']);
@@ -101,7 +100,6 @@ class StationCrudController extends AbstractCrudController
         {
             $oNewPtPrelev = new PointPrelevement();
             $oNewPtPrelev->setStation($oCurrentStation);
-            $oNewPtPrelev->setSite($oCurrentStation->getSites()[0]); // TODO QUID si plusieurs sites ?
             $oNewPtPrelev->setSupport($aPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
             $oNewPtPrelev->setCoordXL93($aPointPrelEauxSurf['CoordXPointEauxSurf']);
             $oNewPtPrelev->setCoordYL93($aPointPrelEauxSurf['CoordYPointEauxSurf']);
