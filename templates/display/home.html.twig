@@ -1,0 +1,29 @@
+{% extends 'display/layout.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="/css/base.css" />
+    <link rel="stylesheet" type="text/css" href="/css/tabulator.min.css" />
+    <script type="text/javascript" src="/js/tabulator.min.js"></script>
+    <script type="text/javascript" src="/js/home.js"></script>
+{% endblock %}
+
+{% block page_contents %}
+    <div id="example-table"></div>
+    <script type="text/javascript">
+        //define data array
+    var tabledata = [
+    {% for site in aSites %}
+        {
+            code:"<a href=\"{{path('detailsite', {codereseau : site.getCodeReseau()})}}\">{{site.getCodeReseau()}}</a>",
+            agence:"{{site.getAgence()}}",
+            dr:"{{site.getDirectionRegionale()}}",
+            hydro:"{{site.getCodeEntiteHydro()}} {{site.getCodeEntiteHydro2()}}",
+            toponyme:"{{site.getToponyme()}} {{site.getToponymeAutre()}}",
+            commune:"{{site.getCommune()}} ({{site.getDepartement()}})"
+        },
+    {% endfor %}
+        ];
+    </script>
+{% endblock %}
+
+            

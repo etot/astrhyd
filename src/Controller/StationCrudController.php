@@ -86,26 +86,39 @@ class StationCrudController extends AbstractCrudController
         {
             foreach($aPointPrelEauxSurf as $oPointPrelEauxSurf)
             {
-                $oNewPtPrelev = new PointPrelevement();
-                $oNewPtPrelev->setStation($oCurrentStation);
-                $oNewPtPrelev->setSupport($oPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
-                $oNewPtPrelev->setCoordXL93($oPointPrelEauxSurf['CoordXPointEauxSurf']);
-                $oNewPtPrelev->setCoordYL93($oPointPrelEauxSurf['CoordYPointEauxSurf']);
-                $oNewPtPrelev->setNumBase($oPointPrelEauxSurf['CdPointEauxSurf']); 
-                $entityManager->persist($oNewPtPrelev);            
-                $oCurrentStation->addPointPrelevement($oNewPtPrelev); 
+                /*
+                Règle de gestion :	Seuls les points dont les codes supports 
+                sont 3 (support eau), 4 (poissons), 10 (diatomées), 13 (invertébrés benthiques), 
+                27 (macrophytes) ou 69 (lit) peuvent être intégrés. 
+                Si le code support n'est pas renseigné (ou mis en «0» -inconnu), 
+                le point ne peut être intégré dans la base.
+                */
+                if(in_array($oPointPrelEauxSurf['SupportPtPrel']['CdSupport'], array('3', '4', '10', '13', '27', '69')))
+                {
+                    $oNewPtPrelev = new PointPrelevement();
+                    $oNewPtPrelev->setStation($oCurrentStation);
+                    $oNewPtPrelev->setSupport($oPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
+                    $oNewPtPrelev->setCoordXL93($oPointPrelEauxSurf['CoordXPointEauxSurf']);
+                    $oNewPtPrelev->setCoordYL93($oPointPrelEauxSurf['CoordYPointEauxSurf']);
+                    $oNewPtPrelev->setNumBase($oPointPrelEauxSurf['CdPointEauxSurf']); 
+                    $entityManager->persist($oNewPtPrelev);            
+                    $oCurrentStation->addPointPrelevement($oNewPtPrelev); 
+                }
             }
         }
         elseif(isset($aPointPrelEauxSurf['CdPointEauxSurf'])) // cas où un seul point de prelev
         {
-            $oNewPtPrelev = new PointPrelevement();
-            $oNewPtPrelev->setStation($oCurrentStation);
-            $oNewPtPrelev->setSupport($aPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
-            $oNewPtPrelev->setCoordXL93($aPointPrelEauxSurf['CoordXPointEauxSurf']);
-            $oNewPtPrelev->setCoordYL93($aPointPrelEauxSurf['CoordYPointEauxSurf']);
-            $oNewPtPrelev->setNumBase($aPointPrelEauxSurf['CdPointEauxSurf']); 
-            $entityManager->persist($oNewPtPrelev);            
-            $oCurrentStation->addPointPrelevement($oNewPtPrelev); 
+            if(in_array($aPointPrelEauxSurf['SupportPtPrel']['CdSupport'], array('3', '4', '10', '13', '27', '69')))
+            {
+                $oNewPtPrelev = new PointPrelevement();
+                $oNewPtPrelev->setStation($oCurrentStation);
+                $oNewPtPrelev->setSupport($aPointPrelEauxSurf['SupportPtPrel']['CdSupport']);
+                $oNewPtPrelev->setCoordXL93($aPointPrelEauxSurf['CoordXPointEauxSurf']);
+                $oNewPtPrelev->setCoordYL93($aPointPrelEauxSurf['CoordYPointEauxSurf']);
+                $oNewPtPrelev->setNumBase($aPointPrelEauxSurf['CdPointEauxSurf']); 
+                $entityManager->persist($oNewPtPrelev);            
+                $oCurrentStation->addPointPrelevement($oNewPtPrelev); 
+            }
         }
         $entityManager->flush();
 

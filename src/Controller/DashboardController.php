@@ -29,7 +29,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class DashboardController extends AbstractDashboardController
 {
     /**
-     * @Route("/", name="admin")
+     * @Route("/saisie", name="admin")
      */
     public function index(): Response
     {

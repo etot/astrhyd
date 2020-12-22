@@ -1,0 +1,56 @@
+body {
+	font-family: 'Roboto',Arial,sans-serif;
+	font-weight: 400;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #464e5a;
+	background-color: #f4f7fe;
+	margin-top: 0;
+}
+a, a:visited {
+	color: #39a9db;
+	font-weight: bold;
+	text-decoration: underline;
+}
+h1{
+	font-size: 20px;
+	margin-left: 10px;
+	margin-bottom: 20px;
+	font-weight: bold;
+	padding: 0;
+	line-height: 1em;
+}
+h2 {
+	font-size: 16px;
+	font-weight: bold;
+	color: #0083CB;
+}
+.todo {
+	color: red;
+	font-weight: bold;
+}
+.header-afb, .content {
+	background-color: #fff;
+	margin: auto;
+	width: 1074px;
+	padding: 20px 0;
+}
+.content { 
+	min-height: 800px;
+}
+.title {
+	background-color: #fff;
+	border-left: 40px solid #0083CB;
+}
+
+.infos {
+	padding:0 50px;
+}
+.header-afb {
+	padding: 0;
+	margin-bottom: 0;
+	box-shadow: 0px 0px 33px 0px rgba(0,0,0,0.2);
+}
+.infovalue {
+	color: #00A6E2;
+}

@@ -1,0 +1,99 @@
+{% extends 'display/layout.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="/css/base.css" />
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs="
+        crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block page_contents %}
+    <h2>
+        Informations sur le site
+        <a href="#" onclick="javscript:$('#detailsite').toggle(); return false;">show / hide</a>
+    </h2>
+    <ul id="detailsite">
+        <li>Code réseau SSM : <span class="infovalue">{{oSite.getCodeReseau()}}</span></li>
+        <li>Agence : <span class="infovalue">{{oSite.getAgence()}}</span></li>
+        <li>Direction régionale OFB : <span class="infovalue">{{oSite.getDirectionRegionale()}}</span></li>
+        <li>Code entité Hydro : <span class="infovalue">{{oSite.getCodeEntiteHydro()}}</span></li>
+        <li>Code entité Hydro 2 : <span class="infovalue">{{oSite.getCodeEntiteHydro2()}}</span></li>
+        <li>Toponyme Sandre : <span class="infovalue">{{oSite.getToponyme()}}</span></li>
+        <li>toponyme si manquant : <span class="infovalue">{{oSite.getToponymeAutre()}}</span></li>
+        <li>Commune : <span class="infovalue">{{oSite.getCommune()}}</span></li>
+        <li>Département : <span class="infovalue">{{oSite.getDepartement()}}</span></li>
+        <li>Diagnostic : <span class="infovalue">{{oSite.getDiagnostic()}}</span></li>
+        <li>Emplacement diagnostic : <span class="infovalue">TODO</span></li>
+        <li>Interlocuteur MO travaux : <span class="infovalue">{{oSite.getInterlocuteur()}}</span></li>
+        <li>Type de travaux prévus : <span class="infovalue">{{oSite.getTypeTravauxPrevus()}}</span></li>
+        <li>Type de travaux réalisés - Principal : <span class="infovalue">{{oSite.getTypeTravauxRealisesPrincipal()}}</span></li>
+        <li>Type de travaux réalisés - Secondaire : <span class="infovalue">{{oSite.getTypeTravauxRealisesSecondaire()}}</span></li>
+        <li>Type de travaux réalisés - Accessoire : <span class="infovalue">{{oSite.getTypeTravauxRealisesAccessoire()}}</span></li>
+        <li>Modalités de l'opération de restauration : <span class="infovalue">{{oSite.getModalitesOperation()}}</span></li>
+        <li>Mesures d'accompagnement : <span class="infovalue">{{oSite.getMesuresAccompagnement()}}</span></li>
+        <li>MO travaux : <span class="infovalue">{{oSite.getMoTravaux()}}</span></li>
+        <li>Linéaire restauré (m) : <span class="infovalue">{{oSite.getLongLineaireRestaure()}}</span></li>
+        <li>Largeur plein bords naturelle (m) : <span class="infovalue">{{oSite.getLargeurPleinBordsNaturelle()}}</span></li>
+        <li>Code ROE principal : <span class="infovalue">{{oSite.getCodeRoe()}}</span></li>
+        <li>Hauteur de chute à l'étiage ROE : <span class="infovalue">{{oSite.getHauteurChuteEtiageRoe()}}</span></li>
+        <li>Hauteur de chute hors ROE (m) : <span class="infovalue">{{oSite.getHauteurChuteHorsRoe()}}</span></li>
+        <li>Date début travaux prévus : <span class="infovalue">{{oSite.getAnneeDebutTravauxPrevus()}}</span></li>
+        <li>Date fin travaux prévus : <span class="infovalue">{{oSite.getAnneeFinTravauxPrevus()}}</span></li>
+        <li>Date effective début travaux : <span class="infovalue">{{oSite.getAnneeEffectiveDebutTravaux()}}</span></li>
+        <li>Date effective fin travaux : <span class="infovalue">{{oSite.getAnneeEffectiveFinTravaux()}}</span></li>
+        <li>Descriptif travaux : <span class="infovalue">{{oSite.getDescriptifTravaux()}}</span></li>
+        <li>Eléments de contexte pour l'analyse : <span class="infovalue">{{oSite.getElementsContexte()}}</span></li>
+    </ul>
+    <h2>Stations associées</h2>
+    {% set aStations = oSite.getStations() %}
+    {% for oStation in aStations %}
+        <h3>
+            Station {{oStation.getNom()}}
+            <a href="#" onclick="javscript:$('#detailstation{{oStation.getCode()}}').toggle(); return false;">show / hide</a>
+        </h3>
+        <ul id="detailstation{{oStation.getCode()}}">
+            <li>Code : <span class="infovalue">{{oStation.getCode()}}</span></li>
+            <li>Nom : <span class="infovalue">{{oStation.getNom()}}</span></li>
+            <li>Code masse d'eau : <span class="infovalue">{{oStation.getCodeMasseEau()}}</span></li>
+            <li>Nom masse d'eau : <span class="infovalue">{{oStation.getNomMasseEau()}}</span></li>
+            <li>Détail situation : <span class="infovalue">{{oStation.getDetailSituation()}}</span></li>
+            <li>Précision positionnement : <span class="infovalue">{{oStation.getPrecisionPositionnement()}}</span></li>
+            <li>Suivi indicateurs fonctionnels : <span class="infovalue">{{oStation.getSuiviIndicateursFonctionnels()}}</span></li>
+            <li>Finalité : <span class="infovalue">{{oStation.getFinalite()}}</span></li>
+            <li>Points de prélèvements : 
+                    {% set aPtsPrelev = oStation.getPointPrelevements() %}
+                    {% for oPtPrelev in aPtsPrelev %}
+                        <h4>Point de prélèvement {{oPtPrelev.getNumbase()}}</h4>
+                        <ul>
+                            <li>Num Base : <span class="infovalue">{{oPtPrelev.getNumbase()}}</span></li>
+                            <li>Support : <span class="infovalue">{{oPtPrelev.getSupport()}}</span></li>
+                            <li>coord_x_l93 : <span class="infovalue">{{oPtPrelev.getCoordXL93()}}</span></li>
+                            <li>coord_y_l93 : <span class="infovalue">{{oPtPrelev.getCoordYL93()}}</span></li>
+                            <li>Opérations de prélèvements :                            
+                                {% set aOpPrelev = oPtPrelev.getOperationPrelevements() %}
+                                {% for oOpPrelev in aOpPrelev %}
+                                    <h5>Opérations de prélèvement {{oOpPrelev.getCodeOperation()}}</h5>
+                                    <ul>
+                                        <li>Code opération : <span class="infovalue">{{oOpPrelev.getCodeOperation()}}</span></li>
+                                        {# TODO
+                                            <li>Date prélèvement : <span class="infovalue">{{oOpPrelev.getDatePrelevement()}}</span></li>
+                                        #}
+                                        <li>MO suivi : <span class="infovalue">{{oOpPrelev.getMOSuivi()}}</span></li>
+                                        <li>Interlocuteurs suivis : <span class="infovalue">{{oOpPrelev.getInterlocuteurSuivis()}}</span></li>
+                                        <li>Protocole : <span class="infovalue">{{oOpPrelev.getProtocole()}}</span></li>
+                                        <li>Conformité SSM : <span class="infovalue">{{oOpPrelev.getConformiteSSM()}}</span></li>
+                                        <li>Banque stockage : <span class="infovalue">{{oOpPrelev.getBanqueStockage()}}</span></li>
+                                        <li>Précision : <span class="infovalue">{{oOpPrelev.getPrecision()}}</span></li>
+                                        <li>Commentaire : <span class="infovalue">{{oOpPrelev.getCommentaire()}}</span></li>
+                                    </ul>
+                                {% endfor %}
+                            </li>
+                        </ul>
+                    {% endfor %}
+            </li>
+        </ul>
+    {% endfor %}
+    </p>
+    
+{% endblock %}

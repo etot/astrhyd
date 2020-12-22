@@ -40,21 +40,6 @@ class PointPrelevement
     private $coord_y_l93;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $station_point;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $reseau_station_point;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $reseau_station;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Station::class, inversedBy="pointPrelevements")
      */
     private $station;
@@ -120,43 +105,7 @@ class PointPrelevement
         $this->coord_y_l93 = $coord_y_l93;
 
         return $this;
-    }
-
-    public function getStationPoint(): ?string
-    {
-        return $this->station_point;
-    }
-
-    public function setStationPoint(?string $station_point): self
-    {
-        $this->station_point = $station_point;
-
-        return $this;
-    }
-
-    public function getReseauStationPoint(): ?string
-    {
-        return $this->reseau_station_point;
-    }
-
-    public function setReseauStationPoint(?string $reseau_station_point): self
-    {
-        $this->reseau_station_point = $reseau_station_point;
-
-        return $this;
-    }
-
-    public function getReseauStation(): ?string
-    {
-        return $this->reseau_station;
-    }
-
-    public function setReseauStation(?string $reseau_station): self
-    {
-        $this->reseau_station = $reseau_station;
-
-        return $this;
-    }
+    }   
 
     public function getStation(): ?Station
     {
