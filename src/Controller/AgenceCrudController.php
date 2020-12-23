@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
 * @IsGranted("ROLE_ADMIN")
+* formulaire de gestion de la nomenclature "agences"
 */
 class AgenceCrudController extends AbstractCrudController
 {
@@ -15,15 +16,4 @@ class AgenceCrudController extends AbstractCrudController
     {
         return Agence::class;
     }
-
-    /*
-    public function configureFields(string $pageName): iterable
-    {
-        return [
-            IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
-        ];
-    }
-    */
 }

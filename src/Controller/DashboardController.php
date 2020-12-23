@@ -30,6 +30,7 @@ class DashboardController extends AbstractDashboardController
 {
     /**
      * @Route("/saisie", name="admin")
+     * page d'accueil du backoffice
      */
     public function index(): Response
     {
@@ -43,6 +44,9 @@ class DashboardController extends AbstractDashboardController
             ->setTitle('Astrhyd');
     }
 
+    /*
+    * menu de gauche du backoffice
+    */
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linktoDashboard('Sites', 'fa fa-home');

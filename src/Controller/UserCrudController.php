@@ -53,6 +53,9 @@ class UserCrudController extends AbstractCrudController
         );
     }
 
+    /**
+     * configuration du formulaire de gestion des utilisateurs dans le backoffice
+     */
     public function configureFields(string $pageName): iterable
     {
         return [

@@ -12,6 +12,7 @@ class SiteController extends AbstractController
 {
      /**
       * @Route("/", name="homepage")
+      * page d'accueil = liste des sites
       */
     public function sitelist(): Response
     {
@@ -22,6 +23,8 @@ class SiteController extends AbstractController
 
     /**
       * @Route("/site/{codereseau}", name="detailsite")
+      * page détail = affiche du site dont le code réseau est passé dans l'URL, 
+      * avec stations, points de prélèvements et opérations de prélèvement associés
       */
     public function detail($codereseau)
     {

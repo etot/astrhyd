@@ -8,9 +8,10 @@
 {% endblock %}
 
 {% block page_contents %}
-    <div id="example-table"></div>
+    <div id="sites-table"></div>
+
+    {# ci-dessous on définit le tableau tabledata en javascript (tabulator js) #}
     <script type="text/javascript">
-        //define data array
     var tabledata = [
     {% for site in aSites %}
         {

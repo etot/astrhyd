@@ -32,21 +32,27 @@ class SiteCrudController extends AbstractCrudController
         return Site::class;
     }
 
+    /** 
+     * load js pour l'autocomplétion dans le formulaire d'édit
+     */
     public function configureAssets(Assets $assets): Assets
     {
-        return $assets
-            ->addJsFile('js/siteform.js');
+        return $assets->addJsFile('js/siteform.js');
     }
 
-    // permet de récupérer les valeurs d'un site édité dans le formulaire d'édit
-    // afin de pré-remplir le champ "communes" à partir de la valeur de "département"
+    /** 
+     * permet de récupérer les valeurs d'un site édité dans le formulaire d'édit
+     * afin de pré-remplir le champ "communes" à partir de la valeur de "département"
+     */ 
     public function edit(AdminContext $context)
     {
         $this->oCurrentSite = $context->getEntity()->getInstance();
         return parent::edit($context);
     }
 
-    // permet d'éviter le problème lié à l'ajout de communes en ajax (this value is not valid)
+    /** 
+     * permet d'éviter le problème lié à l'ajout de communes en ajax (this value is not valid)
+     */ 
     public function createEditFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
     {
         $formBuilder = parent::createEditFormBuilder($entityDto, $formOptions, $context);
@@ -55,7 +61,9 @@ class SiteCrudController extends AbstractCrudController
         return $formBuilder;
     }
 
-    // permet d'éviter le problème lié à l'ajout de communes en ajax (this value is not valid)
+    /** 
+     * permet d'éviter le problème lié à l'ajout de communes en ajax (this value is not valid)
+     */ 
     public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
     {
         $formBuilder = parent::createNewFormBuilder($entityDto, $formOptions, $context);
@@ -64,8 +72,12 @@ class SiteCrudController extends AbstractCrudController
         return $formBuilder;
     }
 
+    /**
+     * configuration des champs
+     */
     public function configureFields(string $pageName): iterable
     {        
+        // années proposées : de 1990 à (année courante + 1)
         $aYears = array();
         for($i=1990; $i<=date('Y')+1; $i++) 
         {
@@ -77,6 +89,7 @@ class SiteCrudController extends AbstractCrudController
         $aDCCodes = array();
 
         // codes réseaux
+        // à partir du Sandre, constitution d'un tableau $aDDCodes[code réseau affiché] = code réseau stocké
         if($pageName != Crud::PAGE_INDEX) // pour ne pas faire un appel inutile à l'API sur index
         {
             $oCRresponse = $client->request('GET', 'https://api.sandre.eaufrance.fr/referentiels/v1/dc.json?outputSchema=SANDREv4');
@@ -90,6 +103,7 @@ class SiteCrudController extends AbstractCrudController
         }
 
         // départements
+        // à partir de l'API geo.api.gouv.fr, constitution d'un tableau $aDepts[dep affiché] = code dep stocké
         $oDepresponse = $client->request('GET', 'https://geo.api.gouv.fr/departements');
         $aDepartementsArray = $oDepresponse->toArray();
         $aDepts = array();
@@ -99,6 +113,8 @@ class SiteCrudController extends AbstractCrudController
         }
 
         // villes
+        // à partir de l'API geo.api.gouv.fr, constitution d'un tableau $aCities[nom] = nom
+        // ce tableau contient uniquement les villes du département du site édité (01 par défaut)
         $sCurrentDept = '01';
         $aCities = array();
         if(is_object($this->oCurrentSite) && !is_null($this->oCurrentSite->getDepartement()))
@@ -120,10 +136,11 @@ class SiteCrudController extends AbstractCrudController
                 ->renderCollapsed(false),
             IdField::new('id')->hideOnForm(),
             
+            // sur les pages autres que INDEX, on fournit la liste des codes réseaux du sandre comme options possibles
             ($pageName != Crud::PAGE_INDEX)?ChoiceField::new('code_reseau')->setChoices($aDCCodes):TextField::new('code_reseau'),
             
             AssociationField::new('agence')
-                ->setCustomOptions(array('widget' => 'native')) // otherwise can't be required : https://github.com/EasyCorp/EasyAdminBundle/issues/3497
+                ->setCustomOptions(array('widget' => 'native')) // sinon ce champ ne peut pas être obligatoire (bug easyadmin ?) : https://github.com/EasyCorp/EasyAdminBundle/issues/3497
                 ->setRequired(true)
                 ->hideOnIndex(),      
             AssociationField::new('direction_regionale')->hideOnIndex()->setFormTypeOptions(array('required' => true)),
@@ -133,6 +150,7 @@ class SiteCrudController extends AbstractCrudController
             TextField::new('toponyme_autre')->hideOnIndex(),
             ChoiceField::new('departement')->setChoices($aDepts),
             
+            // sur les pages autres que INDEX, on fournit la liste des villes comme options
             ($pageName != Crud::PAGE_INDEX)?ChoiceField::new('commune')->setChoices($aCities):TextField::new('commune'),
                         
             TextField::new('diagnostic')->hideOnIndex(),

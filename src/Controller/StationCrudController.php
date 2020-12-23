@@ -26,38 +26,50 @@ class StationCrudController extends AbstractCrudController
         return Station::class;
     }
 
+    /**
+     * sur la page d'édition d'une station dans le backoffice, 
+     * on ajoute un bouton "associer les points de prélèvements"
+     */
     public function configureActions(Actions $actions): Actions
     {
         $getpointsprelev = Action::new('setPointsPrelevements', 'Associer les points de prélèvements depuis le Sandre', 'fa fa-map-pin')
-        ->linkToCrudAction('setPointsPrelevements');
+        ->linkToCrudAction('setPointsPrelevements'); 
+        // cette action est définie dans cette même classe
 
         return $actions->add(Crud::PAGE_EDIT, $getpointsprelev);
     }
 
+    /**
+     * load css et js pour le formulaire de gestion des stations
+     * indispensable pour les champs en autocomplétion
+     */
     public function configureAssets(Assets $assets): Assets
     {
         return $assets
-            //->addJsFile('https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.jquery.min.js')
             ->addCssFile('https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css')
-            //->addJsFile('https://code.jquery.com/jquery-1.12.4.js')
             ->addJsFile('https://code.jquery.com/ui/1.12.1/jquery-ui.js')
             ->addJsFile('js/stationform.js');
     }
 
+    /**
+     * création et association automatiques des points de prélèvements associés à la station dans le Sandre
+     * = résultat du clic sur le bouton "associer les points de prélèvements"
+     */
     public function setPointsPrelevements(AdminContext $context)
     {
         $oCurrentStation = $context->getEntity()->getInstance(); 
 
+        // construction de l'url du formulaire d'édition de la station
+        // pour redirection à la fin de l'action
         $crudUrlGenerator = $this->get(CrudUrlGenerator::class);
         $redirectUrl = $crudUrlGenerator->build()
             ->setController(StationCrudController::class)
             ->setAction('edit')
             ->generateUrl();
-            
-        $aCurrentPtsPrelevements = $oCurrentStation->getPointPrelevements();
-
+        
         // si la station est déjà associée à des points de prélèvements 
         // alors on ne fait rien
+        $aCurrentPtsPrelevements = $oCurrentStation->getPointPrelevements();
         if(!$aCurrentPtsPrelevements->isEmpty())
         {
             $this->addFlash('warning', 'Vous ne pouvez pas associer automatiquement des points de prélèvements à cette station car des points de prélèvements y sont déjà associés.');
@@ -66,13 +78,13 @@ class StationCrudController extends AbstractCrudController
 
         $code = $oCurrentStation->getCode();
         
-        // TODO utiliser cette URL plus simple
+        // TODO utiliser cette URL plus simple ? voir si elle est compatible avec la compression
         // $sandreApiUrl =  'https://api.sandre.eaufrance.fr/referentiels/v1/stq/';  
         // $sandreApiUrl .= $code . '.json';
         
         $sandreApiUrl = 'https://api.sandre.eaufrance.fr/referentiels/v1/stq.json?outputSchema=SANDREv4&filter=%3CFilter%3E%3CIS%3E%3CField%3ECdStationMesureEauxSurface%3C%2FField%3E%3CValue%3E';
         $sandreApiUrl .= $code . '%3C%2FValue%3E%3C%2FIS%3E%3C%2FFilter%3E&limit=100';
-        $sandreApiUrl .= '&compress=true';
+        $sandreApiUrl .= '&compress=true'; // compression, pour éviter les timeout
 
         $client = HttpClient::create();
         $oGzPPresponse = $client->request('GET', $sandreApiUrl);
@@ -127,6 +139,9 @@ class StationCrudController extends AbstractCrudController
         return $this->redirect($redirectUrl);
     }
 
+    /**
+     * configuration des champs affichés dans le backoffice
+     */
     public function configureFields(string $pageName): iterable
     {
         return [

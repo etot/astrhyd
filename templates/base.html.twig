@@ -10,8 +10,12 @@
     <body>
         {% block body %}
             <div class="header-afb"> 
-                <p><a href="{{path('homepage')}}">Consultation</a> </p>
-                <p><a href="{{path('admin')}}">Accès saisie</a></p>
+                <img src="/img/Republique_Francaise_RVB.png" alt="République française" />
+                <img src="/img/logo-ofb.png" alt="Office français de la biodiversité" />
+                <ul>
+                    <li><a href="{{path('homepage')}}">Consultation</a> </li>
+                    <li><a href="{{path('admin')}}">Accès saisie</a></li>
+                </ul>
             </div>
             <div class="content">
                 {% block content %}{% endblock %}

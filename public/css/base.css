@@ -1,10 +1,10 @@
 body {
-	font-family: 'Roboto',Arial,sans-serif;
+	font-family: 'Nunito Sans', Arial, sans-serif;
 	font-weight: 400;
 	font-size: 14px;
 	line-height: 1.42857143;
 	color: #464e5a;
-	background-color: #f4f7fe;
+	/* background-color: #f4f7fe; */
 	margin-top: 0;
 }
 a, a:visited {
@@ -25,14 +25,10 @@ h2 {
 	font-weight: bold;
 	color: #0083CB;
 }
-.todo {
-	color: red;
-	font-weight: bold;
-}
 .header-afb, .content {
 	background-color: #fff;
 	margin: auto;
-	width: 1074px;
+	width: 1200px;
 	padding: 20px 0;
 }
 .content { 
@@ -49,8 +45,45 @@ h2 {
 .header-afb {
 	padding: 0;
 	margin-bottom: 0;
-	box-shadow: 0px 0px 33px 0px rgba(0,0,0,0.2);
+	/*box-shadow: 0px 0px 33px 0px rgba(0,0,0,0.2);*/
+}
+.header-afb img {
+	max-width: 150px;
+	max-height: 100px;
+	vertical-align: middle;
 }
 .infovalue {
 	color: #00A6E2;
+}
+.header-afb ul {
+	padding: 0;
+	display: inline;
+	margin-left: 40px;
+}
+.header-afb ul li {
+	display: inline-block;
+	list-style: none; 
+	margin: 0;
+	text-align: center;
+	text-transform: uppercase;
+	font-weight: 800;
+	font-size: 14px;
+	width: 130px;
+	border:0;
+}
+.header-afb ul li a {
+	display: block;	
+	border-bottom: 3px solid white;
+	padding : 35px 0;
+	text-decoration: none;
+	color: #000;
+} 
+.header-afb ul li a:hover, .header-afb ul li a:focus, .header-afb ul li a:active {
+	border-bottom: 3px solid #003A76;
+	background-color: #e5e8f1;
+	color: #000;
+}
+.header-afb ul li a.selected
+{
+	background-color:#7ebd26;
 }

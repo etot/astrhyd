@@ -29,10 +29,7 @@ class PointPrelevementCrudController extends AbstractCrudController
             CollectionField::new('operationPrelevements', 'OperationPrelevement')
                 ->allowAdd() 
                 ->allowDelete()
-                // ->setEntryIsComplex(true)
                 ->setEntryType(OperationPrelevementType::class),
-                // ->setFormTypeOptions(['by_reference' => 'false']),
-            
         ];
     }
 }
