@@ -29,7 +29,10 @@ h2 {
 	background-color: #fff;
 	margin: auto;
 	width: 1200px;
-	padding: 20px 0;
+	padding: 10px 0; 
+}
+ul {
+    list-style:none;
 }
 .content { 
 	min-height: 800px;
@@ -45,7 +48,7 @@ h2 {
 .header-afb {
 	padding: 0;
 	margin-bottom: 0;
-	/*box-shadow: 0px 0px 33px 0px rgba(0,0,0,0.2);*/
+	box-shadow: 0px 0px 33px 0px rgba(0,0,0,0.2);
 }
 .header-afb img {
 	max-width: 150px;
@@ -53,7 +56,7 @@ h2 {
 	vertical-align: middle;
 }
 .infovalue {
-	color: #00A6E2;
+	color: #0083CB;
 }
 .header-afb ul {
 	padding: 0;
@@ -83,7 +86,38 @@ h2 {
 	background-color: #e5e8f1;
 	color: #000;
 }
-.header-afb ul li a.selected
-{
+.header-afb ul li a.selected {
 	background-color:#7ebd26;
 }
+.column {
+	float: left;
+	width: 40%;
+}
+/* Clear floats after the columns */
+.row:after {
+	content: "";
+	display: table;
+	clear: both;
+  }
+
+  .operationsprelevement {
+	border-collapse: collapse;
+	width: 100%;
+  }
+  
+  .operationsprelevement td, .operationsprelevement th {
+	border: 1px solid #ddd;
+	padding: 8px;
+  }
+  
+  .operationsprelevement tr:nth-child(even){background-color: #f2f2f2;}
+  
+  .operationsprelevement tr:hover {background-color: #ddd;}
+  
+  .operationsprelevement th {
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+	background-color: #4CAF50;
+	color: white;
+  }
